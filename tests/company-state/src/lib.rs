@@ -205,6 +205,25 @@ mod tests {
         assert!(result.is_err());
     }
 
+    #[test]
+    fn test_batch_process_payroll_idempotent_rejected_when_incomplete() {
+        let env = Env::default();
+        let (payroll_client, admin, employee) = setup(&env);
+        payroll_client.set_company_state(&admin, &CompanyState::Incomplete);
+
+        let (proofs, amounts, employees) = single_batch(&env, &employee);
+        let result = payroll_client.try_batch_process_payroll_idempotent(
+            &BytesN::from_array(&env, &[9u8; 32]),
+            &proofs,
+            &amounts,
+            &employees,
+            &1000i128,
+            &test_nonce(&env, 8),
+            &None,
+        );
+        assert!(result.is_err());
+    }
+
     /// Round trip: pausing blocks execution, and restoring Active resumes it
     /// — the gate must not be a one-way trip.
     #[test]

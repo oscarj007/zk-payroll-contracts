@@ -2959,6 +2959,7 @@ impl Payroll {
         nonce: BytesN<32>,
         draft_hash: Option<BytesN<32>>,
     ) -> u64 {
+        Self::require_company_active(&e);
         Self::validate_non_zero_digest(&e, &idempotency_key, "idempotency_key");
 
         let payload_hash = Self::hash_payroll_execution_payload(
